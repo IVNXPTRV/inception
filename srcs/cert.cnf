@@ -28,3 +28,10 @@ subjectAltName = @alt_names
 DNS.1 = localhost
 DNS.2 = 127.0.0.1
 DNS.3 = ipetrov.42.fr 
+
+# IMPORTANT: Ensure 'cert_config.cnf' is the name of your configuration file
+# openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes \
+#    -keyout server.key \
+#    -out server.crt \
+#    -config cert.cnf \
+#    -extensions v3_req
