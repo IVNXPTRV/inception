@@ -1,15 +1,63 @@
 version: '3.8'
 
 services:
+
   nginx:
     container_name: nginx
     build: ./requirements/nginx/
     ports:
-      - 80:80
       - 443:443
     restart: always
     secrets:
       - server.key
+    volumes:
+      wordpress:/var/www/html/
+    networks:
+      - frontend
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress/
+    restart: always
+    secrets:
+      - server.key
+    volumes:
+      wordpress:/var/www/html/
+    networks:
+      - frontend
+      - backend
+
+  mariadb:
+    container_name: mariadb 
+    build: ./requirements/mariadb/
+    restart: always
+    secrets:
+      - server.key
+    volumes:
+      mariadb:/var/www/html/
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  wordpress:
+    driver: local
+    name: wordpress
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUMES_PATH}/website
+  mariadb:
+    driver: local
+    name: mariadb
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUMES_PATH}/mariadb
     
 secrets:
   server.key:
