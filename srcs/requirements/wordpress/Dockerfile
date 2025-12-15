@@ -21,11 +21,8 @@ RUN wget https://wordpress.org/latest.tar.gz && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp \
 
-RUN chown -R www-data:www-data /var/www/html
+COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+COPY ./tools/configure.sh /bin/
 
-COPY ./tools/configure.sh /tmp/
-RUN chmod +x /tmp/configure.sh
-
-ENTRYPOINT ["/tmp/configure.sh"]
+ENTRYPOINT ["/bin/configure.sh"]
 CMD ["php-fpm", "-F"]
-# mv wp-config-sample.php wp-config.php && \

@@ -2,6 +2,9 @@
 
 set -e
 
+mkdir -p /run/mysqld
+chown mysql:mysql /run/mysqld
+
 if [ -f ./wp-config.php ]; then
 	echo "wordpress already configured"
     exec "$@"
