@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   nginx:
@@ -7,20 +5,24 @@ services:
     build: ./requirements/nginx/
     ports:
       - 443:443
-    restart: always
+    # restart: always
     secrets:
       - server.key
     volumes:
       - wordpress:/var/www/html/
     networks:
       - frontend
+    depends_on:
+      - wordpress
+    env_file:
+      - .env
 
   wordpress:
     container_name: wordpress
     build: ./requirements/wordpress/
-    restart: always
+    # restart: always
     secrets:
-      - db_password
+      - db_user_password
       - wp_admin_password
       - wp_user_password
     volumes:
@@ -28,19 +30,25 @@ services:
     networks:
       - frontend
       - backend
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
 
   mariadb:
     container_name: mariadb 
     build: ./requirements/mariadb/
-    restart: always
+    # restart: always
     secrets:
-      - db_password
+      - db_root_password
+      - db_user_password
     volumes:
       - mariadb:/var/lib/mysql/
     networks:
-      - frontend
       - backend
-
+    env_file:
+      - .env
+      
 networks:
   frontend:
   backend:
@@ -52,20 +60,22 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUMES_PATH}/website
+      device: ${VOLUMES_PATH}/website/
   mariadb:
     driver: local
     name: mariadb
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUMES_PATH}/mariadb
+      device: ${VOLUMES_PATH}/mariadb/
     
 secrets:
   server.key:
     file: ../secrets/server.key
-  db_password:
-    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_user_password:
+    file: ../secrets/db_user_password.txt
   wp_admin_password:
     file: ../secrets/wp_admin_password.txt
   wp_user_password:

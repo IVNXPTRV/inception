@@ -22,5 +22,5 @@ COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/
 COPY ./tools/configure.sh /bin/
 RUN chmod +x /bin/configure.sh
 
-ENTRYPOINT ["/bin/configure.sh"]
-CMD ["php-fpm8.2", "-F"]
+ENTRYPOINT ["/usr/sbin/php-fpm8.2"]
+CMD ["-F"]
