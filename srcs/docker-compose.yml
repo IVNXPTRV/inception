@@ -16,24 +16,30 @@ services:
       - wordpress
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "curl", "-fk", "https://localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   wordpress:
-    container_name: wordpress
-    build: ./requirements/wordpress/
-    restart: on-failure 
-    secrets:
-      - db_user_password
-      - wp_admin_password
-      - wp_user_password
-    volumes:
-      - wordpress:/var/www/html/
-    networks:
-      - frontend
-      - backend
-    depends_on:
-      - mariadb
-    env_file:
-      - .env
+      container_name: wordpress
+      build: ./requirements/wordpress/
+      restart: on-failure 
+      secrets:
+        - db_user_password
+        - wp_admin_password
+        - wp_user_password
+      volumes:
+        - wordpress:/var/www/html/
+      networks:
+        - frontend
+        - backend
+      depends_on:
+        - mariadb
+      env_file:
+        - .env
 
   mariadb:
     container_name: mariadb 
@@ -64,14 +70,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUMES_PATH}/website/
+      device: /${VOLUMES_PATH}/wordpress/
   mariadb:
     driver: local
     name: mariadb
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUMES_PATH}/mariadb/
+      device: /${VOLUMES_PATH}/mariadb/
     
 secrets:
   server.key:
