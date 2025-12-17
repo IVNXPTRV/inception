@@ -1,31 +1,5 @@
 #!/usr/bin/env sh
 
-# wp core download --allow-root --path="/var/www/html"
-# wp core is-installed --allow-root --path="/var/www/html" 
-# wp config create --allow-root \
-#     --dbname="wordpress" \
-#     --dbuser="wp_user" \
-#     --dbhost="172.17.0.3:3306" \
-#     --dbpass="bonamp-tofasi" \
-#     --dbcharset="utf8" \
-#     --dbcollate="utf8_general_ci" \
-#     --path="/var/www/html"
-    
-# wp core install --allow-root \
-#         --url="ipetrov.42.fr" \
-#         --title="Inception" \
-#         --admin_user="muzzle" \
-#         --admin_email="muzzle@m.c" \
-#         --admin_password="1234" \
-#         --path="/var/www/html/"
-
-# wp user create --allow-root \
-#         "$WP_USER_NAME" \
-#         "$WP_USER_EMAIL" \
-#         --user_pass="$WP_USER_PASSWORD" \
-#         --role=author \
-#         --path="$WP_PATH"
-
 set -e
 
 WP_PATH="/var/www/html/"
@@ -38,9 +12,9 @@ fi
 
 echo "Waiting for database connection..."
     while ! nc -z "$DB_HOST" "$DB_PORT"; do
-        sleep 1
+        sleep 5
     done
-echo "Database is ready! Starting WordPress configuration."
+echo "Database is ready!"
  
 if ! wp core is-installed --allow-root --path="$WP_PATH" 2> /dev/null ; then
     echo "Wordpress core is not installed."

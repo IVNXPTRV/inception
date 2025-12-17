@@ -5,7 +5,7 @@ services:
     build: ./requirements/nginx/
     ports:
       - 443:443
-    # restart: always
+    restart: on-failure 
     secrets:
       - server.key
     volumes:
@@ -20,7 +20,7 @@ services:
   wordpress:
     container_name: wordpress
     build: ./requirements/wordpress/
-    # restart: always
+    restart: on-failure 
     secrets:
       - db_user_password
       - wp_admin_password
@@ -38,7 +38,7 @@ services:
   mariadb:
     container_name: mariadb 
     build: ./requirements/mariadb/
-    # restart: always
+    restart: on-failure 
     secrets:
       - db_root_password
       - db_user_password
@@ -51,7 +51,11 @@ services:
       
 networks:
   frontend:
+    name: frontend
+    external: false
   backend:
+    name: backend
+    external: false
 
 volumes:
   wordpress:
