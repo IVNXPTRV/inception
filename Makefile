@@ -16,9 +16,10 @@ gen-certificate:
 		-keyout ./secrets/server.key \
 		-out ./srcs/requirements/nginx/tools/server.crt \
 		-config ./srcs/requirements/tools/cert.cnf \
-		-extensions v3_req
-	@echo "------------"
+		-extensions v3_req 2> /dev/null
 	@echo import certificate into your system from: ./srcs/requirements/nginx/tools/server.crt
+	@echo "Trying to add certificate to Local Trust Store.."
+	@(cat ./srcs/requirements/nginx/tools/server.crt | sudo tee -a /etc/ssl/certs/ca-certificates.crt > /dev/null) || true
 
 gen-passwords:
 	@openssl rand -base64 3 > ./secrets/db_root_password.txt 
@@ -27,22 +28,23 @@ gen-passwords:
 	@openssl rand -base64 3 > ./secrets/wp_user_password.txt 
 
 clean-secrets:
-	@rm -rf ./secrets/
+	@rm -rf ./secrets/*
 
 prep-gen-secrets:
-	@sudo mkdir -p ./secrets/
+	@echo "Generating new secrets..."
+	@mkdir -p ./secrets/
 
-gen-secrets: sudo clean-secrets prep-gen-secrets gen-passwords gen-certificate
+gen-secrets: sudo prep-gen-secrets clean-secrets gen-passwords gen-certificate
 
-# update /etc/hosts for dns
-hosts:
+add-domain-name: sudo
+	@grep -q "${DOMAIN_NAME}" /etc/hosts || (echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts > /dev/null) || true
 
-all: up
+all: gen-secrets restart
 
 sudo:
 	@sudo -v 
 
-up: sudo
+up: sudo add-domain-name
 	@sudo mkdir -p /$(VOLUMES_PATH)/mariadb
 	@sudo mkdir -p /$(VOLUMES_PATH)/wordpress
 	@sudo chmod 755 /$(VOLUMES_PATH)/mariadb
@@ -57,9 +59,11 @@ down:
 clean:
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all 
 
-fclean:
+fclean: sudo
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes
-	@rm -rf /$(VOLUMES_PATH)/*
+	@sudo rm -rf /$(VOLUMES_PATH)/*
+	@echo "Removing ${DOMAIN_NAME} from /etc/hosts..."
+	@sudo sed -i "/${DOMAIN_NAME}/d" /etc/hosts
 
 restart: fclean up
 # end
