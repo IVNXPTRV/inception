@@ -8,9 +8,6 @@ ifneq (,$(wildcard ./srcs/.env))
     include ./srcs/.env
 endif
 
-test:
-	@echo "test: $(VOLUMES_PATH)"
-
 gen-certificate: 
 	@openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes \
 		-keyout ./secrets/server.key \
@@ -74,4 +71,5 @@ logs:
 	@docker logs nginx --tail 20
 
 re: fclean up
-# end
+
+.PHONY: all up down fclean clean logs re gen-secrets
