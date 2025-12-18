@@ -39,7 +39,7 @@ gen-secrets: sudo prep-gen-secrets clean-secrets gen-passwords gen-certificate
 add-domain-name: sudo
 	@grep -q "${DOMAIN_NAME}" /etc/hosts || (echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts > /dev/null) || true
 
-all: gen-secrets restart
+all: gen-secrets re
 
 sudo:
 	@sudo -v 
@@ -65,5 +65,13 @@ fclean: sudo
 	@echo "Removing ${DOMAIN_NAME} from /etc/hosts..."
 	@sudo sed -i "/${DOMAIN_NAME}/d" /etc/hosts
 
-restart: fclean up
+ps:
+	@docker compose -f ./srcs/docker-compose.yml ps -a
+
+logs:
+	@docker logs mariadb --tail 20
+	@docker logs wordpress --tail 20
+	@docker logs nginx --tail 20
+
+re: fclean up
 # end
