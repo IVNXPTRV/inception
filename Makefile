@@ -4,6 +4,8 @@
 # @file
 # @version 0.1
 
+all: gen-secrets re
+
 ifneq (,$(wildcard ./srcs/.env))
     include ./srcs/.env
 endif
@@ -35,8 +37,6 @@ gen-secrets: sudo prep-gen-secrets clean-secrets gen-passwords gen-certificate
 
 add-domain-name: sudo
 	@grep -q "${DOMAIN_NAME}" /etc/hosts || (echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts > /dev/null) || true
-
-all: gen-secrets re
 
 sudo:
 	@sudo -v 
@@ -73,10 +73,10 @@ logs:
 re: fclean up
 
 hard-reset-docker:
-	@docker stop $(docker ps -qa) || true
-	@docker rm $(docker ps -qa) || true
-	@docker rmi -f $(docker images -qa) || true
-	@docker volume rm $(docker volume ls -q) || true
-	@docker network rm $(docker network ls -q) 2> /dev/null || true
+	@docker stop $$(docker ps -qa) || true
+	@docker rm $$(docker ps -qa) || true
+	@docker rmi -f $$(docker images -qa) || true
+	@docker volume rm $$(docker volume ls -q) || true
+	@docker network rm $$(docker network ls -q) 2> /dev/null || true
 
 .PHONY: all up down fclean clean logs re gen-secrets
